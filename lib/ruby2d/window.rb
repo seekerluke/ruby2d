@@ -136,6 +136,10 @@ module Ruby2D
         get(:screenshot, opts)
       end
 
+      def camera
+        get(:camera)
+      end
+
       def get(sym, opts = nil)
         DSL.window.get(sym, opts)
       end
@@ -235,6 +239,7 @@ module Ruby2D
       when :mouse_y then         @mouse_y
       when :diagnostics then     @diagnostics
       when :screenshot then      screenshot(opts)
+      when :camera then          @camera
       end
     end
     # rubocop:enable Metrics/CyclomaticComplexity
@@ -255,6 +260,7 @@ module Ruby2D
     # @option opts [Boolean] :fullscreen
     # @option opts [Numeric] :fps_cap
     # @option opts [Numeric] :diagnostics
+    # @option opts [Numeric] :camera
     def set(opts)
       # Store new window attributes, or ignore if nil
       _set_any_window_properties opts
@@ -457,6 +463,9 @@ module Ruby2D
 
       # Clear inputs if using class pattern
       _clear_event_stores unless @using_dsl
+
+      # Update camera after everything moves, but before rendering
+      @camera&.apply
     end
 
     # Render callback method, called by the native and web extentions
@@ -521,6 +530,7 @@ module Ruby2D
       @resizable       = opts[:resizable]       if opts[:resizable]
       @borderless      = opts[:borderless]      if opts[:borderless]
       @fullscreen      = opts[:fullscreen]      if opts[:fullscreen]
+      @camera          = opts[:camera]          if opts[:camera]
     end
 
     def _set_any_window_dimensions(opts)
@@ -719,6 +729,9 @@ module Ruby2D
       # Size of the computer's display
       @display_width = nil
       @display_height = nil
+
+      # Default camera
+      @camera = Camera.new
     end
 
     def _init_event_stores

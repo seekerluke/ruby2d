@@ -244,6 +244,22 @@ void R2D_GL_SetViewZoom(GLfloat x, GLfloat y) {
 
 
 /*
+ * Applies the view matrix
+ */
+void R2D_GL_ApplyView() {
+  #if GLES
+    R2D_GLES_ApplyView(viewMatrix);
+  #else
+    if (R2D_GL2) {
+      R2D_GL2_ApplyView(viewMatrix);
+    } else {
+      R2D_GL3_ApplyView(viewMatrix);
+    }
+  #endif
+}
+
+
+/*
  * Apply the inverse of the view matrix to the provided position values
  * Mostly used for converting mouse coordinates
  */

@@ -1859,6 +1859,24 @@ static R_VAL ruby2d_window_ext_close() {
 }
 
 
+/*
+ * Ruby2D::Camera#ext_set_view
+ */
+#if MRUBY
+static R_VAL ruby2d_camera_ext_set_view(mrb_state* mrb, R_VAL self) {
+  mrb_value x, y, angle, zx, zy;
+  mrb_get_args(mrb, "ooooo", &x, &y, &angle, &zx, &zy);
+#else
+static R_VAL ruby2d_camera_ext_set_view(R_VAL self, R_VAL x, R_VAL y, R_VAL angle, R_VAL zx, R_VAL zy) {
+#endif
+  R2D_GL_SetViewPosition(NUM2DBL(x), NUM2DBL(y));
+  R2D_GL_SetViewAngle(NUM2DBL(angle));
+  R2D_GL_SetViewZoom(NUM2DBL(zx), NUM2DBL(zy));
+  R2D_GL_ApplyView();
+  return R_NIL;
+}
+
+
 #if MRUBY
 /*
  * MRuby entry point
@@ -2057,6 +2075,12 @@ void Init_ruby2d() {
 
   // Ruby2D::Window#ext_close
   r_define_method(ruby2d_window_class, "ext_close", ruby2d_window_ext_close, r_args_none);
+
+  // Ruby2D::Camera
+  R_CLASS ruby2d_camera_class = r_define_class(ruby2d_module, "Camera");
+
+  // Ruby2D::Camera#ext_set_view
+  r_define_method(ruby2d_camera_class, "ext_set_view", ruby2d_camera_ext_set_view, r_args_req(5));
 
 #if MRUBY
   // Load the Ruby 2D app
