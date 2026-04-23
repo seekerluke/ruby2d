@@ -1869,9 +1869,7 @@ static R_VAL ruby2d_camera_ext_set_view(mrb_state* mrb, R_VAL self) {
 #else
 static R_VAL ruby2d_camera_ext_set_view(R_VAL self, R_VAL x, R_VAL y, R_VAL angle, R_VAL zx, R_VAL zy) {
 #endif
-  R2D_GL_SetViewPosition(NUM2DBL(x), NUM2DBL(y));
-  R2D_GL_SetViewAngle(NUM2DBL(angle));
-  R2D_GL_SetViewZoom(NUM2DBL(zx), NUM2DBL(zy));
+  R2D_GL_SetViewMatrix(NUM2DBL(x), NUM2DBL(y), NUM2DBL(angle), NUM2DBL(zx), NUM2DBL(zy));
   R2D_GL_ApplyView();
   return R_NIL;
 }

@@ -213,33 +213,21 @@ void R2D_GL_SetViewport(R2D_Window *window) {
 
 
 /*
- * Sets the position of the view matrix in pixel coordinates (translation)
+ * Set translation, rotation, scale on the view matrix
+ * Angle is in degrees
  */
-void R2D_GL_SetViewPosition(GLfloat x, GLfloat y) {
-  // inverted, because the view should act like a camera
+void R2D_GL_SetViewMatrix(GLfloat x, GLfloat y, GLfloat angle, GLfloat sx, GLfloat sy) {
+  GLfloat radians = angle * M_PI / 180.f;
+  GLfloat c = cosf(radians);
+  GLfloat s = sinf(radians);
+
+  viewMatrix[0] = c * sx;
+  viewMatrix[4] = -s * sy;
+  viewMatrix[1] = s * sx;
+  viewMatrix[5] = c * sy;
+
   viewMatrix[12] = -x;
   viewMatrix[13] = -y;
-}
-
-
-/*
- * Set the angle of the view matrix in degrees (rotation)
- */
-void R2D_GL_SetViewAngle(GLfloat angle) {
-  GLfloat radians = angle * M_PI / 180.f;
-  viewMatrix[0] = cosf(radians);
-  viewMatrix[4] = -sinf(radians);
-  viewMatrix[1] = sinf(radians);
-  viewMatrix[5] = cosf(radians);
-}
-
-
-/*
- * Set the zoom level of the view matrix (scale)
- */
-void R2D_GL_SetViewZoom(GLfloat x, GLfloat y) {
-  viewMatrix[0] = x;
-  viewMatrix[5] = y;
 }
 
 

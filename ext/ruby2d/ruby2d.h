@@ -701,9 +701,7 @@ GLuint R2D_GL_LoadShader(GLenum type, const GLchar *shaderSrc, const char *shade
 int R2D_GL_CheckLinked(GLuint program, const char *name);
 void R2D_GL_GetViewportScale(R2D_Window *window, int *w, int *h, double *scale);
 void R2D_GL_SetViewport(R2D_Window *window);
-void R2D_GL_SetViewPosition(GLfloat x, GLfloat y);
-void R2D_GL_SetViewAngle(GLfloat angle);
-void R2D_GL_SetViewZoom(GLfloat x, GLfloat y);
+void R2D_GL_SetViewMatrix(GLfloat x, GLfloat y, GLfloat angle, GLfloat sx, GLfloat sy);
 void R2D_GL_ApplyView();
 void R2D_GL_ApplyInverseView(int *x, int *y);
 void R2D_GL_CreateTexture(
