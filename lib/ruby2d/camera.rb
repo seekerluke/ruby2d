@@ -21,6 +21,7 @@ module Ruby2D
       @zoom = zoom
     end
 
+    # Apply camera positions, handled by the window
     def apply
       ext_set_view(@x, @y, @angle, @zoom, @zoom)
     end
