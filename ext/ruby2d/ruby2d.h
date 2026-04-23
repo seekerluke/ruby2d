@@ -701,6 +701,7 @@ GLuint R2D_GL_LoadShader(GLenum type, const GLchar *shaderSrc, const char *shade
 int R2D_GL_CheckLinked(GLuint program, const char *name);
 void R2D_GL_GetViewportScale(R2D_Window *window, int *w, int *h, double *scale);
 void R2D_GL_SetViewport(R2D_Window *window);
+void R2D_GL_ApplyInverseView(int *x, int *y);
 void R2D_GL_CreateTexture(
   GLuint *id, GLint internalFormat, GLint format, GLenum type,
   int w, int h,
@@ -722,6 +723,7 @@ void R2D_GL_FlushBuffers();
 #if GLES
   int R2D_GLES_Init();
   void R2D_GLES_ApplyProjection(GLfloat orthoMatrix[16]);
+  void R2D_GLES_ApplyView(GLfloat viewMatrix[16]);
   void R2D_GLES_DrawTriangle(
     GLfloat x1, GLfloat y1,
     GLfloat r1, GLfloat g1, GLfloat b1, GLfloat a1,
@@ -736,6 +738,8 @@ void R2D_GL_FlushBuffers();
   int R2D_GL3_Init();
   void R2D_GL2_ApplyProjection(int w, int h);
   void R2D_GL3_ApplyProjection(GLfloat orthoMatrix[16]);
+  void R2D_GL2_ApplyView(GLfloat viewMatrix[16]);
+  void R2D_GL3_ApplyView(GLfloat viewMatrix[16]);
   void R2D_GL2_DrawTriangle(
     GLfloat x1, GLfloat y1,
     GLfloat r1, GLfloat g1, GLfloat b1, GLfloat a1,

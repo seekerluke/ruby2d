@@ -132,6 +132,7 @@ void main_loop() {
       case SDL_MOUSEBUTTONDOWN: case SDL_MOUSEBUTTONUP:
         if (window->on_mouse) {
           R2D_GetMouseOnViewport(window, e.button.x, e.button.y, &mx, &my);
+          R2D_GL_ApplyInverseView(&mx, &my);
           R2D_Event event = {
             .button = e.button.button, .x = mx, .y = my
           };
@@ -154,6 +155,7 @@ void main_loop() {
       case SDL_MOUSEMOTION:
         if (window->on_mouse) {
           R2D_GetMouseOnViewport(window, e.motion.x, e.motion.y, &mx, &my);
+          R2D_GL_ApplyInverseView(&mx, &my);
           R2D_Event event = {
             .type = R2D_MOUSE_MOVE,
             .x = mx, .y = my, .delta_x = e.motion.xrel, .delta_y = e.motion.yrel
@@ -253,6 +255,7 @@ void main_loop() {
   int wx, wy;  // mouse x, y coordinates relative to the window
   SDL_GetMouseState(&wx, &wy);
   R2D_GetMouseOnViewport(window, wx, wy, &window->mouse.x, &window->mouse.y);
+  R2D_GL_ApplyInverseView(&window->mouse.x, &window->mouse.y);
 
   // Update Window State /////////////////////////////////////////////////////
 

@@ -8,14 +8,21 @@ static bool FORCE_GL2 = false;
 // Flag set if using OpenGL 2.1
 static bool R2D_GL2 = false;
 
-// The orthographic projection matrix for 2D rendering.
+// The orthographic projection matrix for 2D rendering. Column major.
 // Elements 0 and 5 are set in R2D_GL_SetViewport.
 static GLfloat orthoMatrix[16] =
-  {    0,    0,     0,    0,
-       0,    0,     0,    0,
+  {    0,    0,      0,     0,
+       0,    0,      0,     0,
        0,    0,     0,    0,
    -1.0f, 1.0f, -1.0f, 1.0f };
 
+// The default view matrix for 2D rendering.
+// Defined in pixel space and converted to NDC by the projection matrix in the shader.
+static GLfloat viewMatrix[16] =
+  {  1.0f,   0,     0,    0,
+       0,    1.0f,  0,    0,
+       0,    0,  1.0f,  0,
+      0,   0,    0, 1.0f };
 
 /*
  * Prints current GL error
@@ -206,6 +213,71 @@ void R2D_GL_SetViewport(R2D_Window *window) {
 
 
 /*
+ * Sets the position of the view matrix in pixel coordinates (translation)
+ */
+void R2D_GL_SetViewPosition(GLfloat x, GLfloat y) {
+  // inverted, because the view should act like a camera
+  viewMatrix[12] = -x;
+  viewMatrix[13] = -y;
+}
+
+
+/*
+ * Set the angle of the view matrix in degrees (rotation)
+ */
+void R2D_GL_SetViewAngle(GLfloat angle) {
+  GLfloat radians = angle * M_PI / 180.f;
+  viewMatrix[0] = cosf(radians);
+  viewMatrix[4] = -sinf(radians);
+  viewMatrix[1] = sinf(radians);
+  viewMatrix[5] = cosf(radians);
+}
+
+
+/*
+ * Set the zoom level of the view matrix (scale)
+ */
+void R2D_GL_SetViewZoom(GLfloat x, GLfloat y) {
+  viewMatrix[0] = x;
+  viewMatrix[5] = y;
+}
+
+
+/*
+ * Apply the inverse of the view matrix to the provided position values
+ * Mostly used for converting mouse coordinates
+ */
+void R2D_GL_ApplyInverseView(int *x, int *y) {
+
+  // Details on how this works here:
+  // https://www.mathsisfun.com/algebra/matrix-inverse.html
+
+  float a = viewMatrix[0];
+  float b = viewMatrix[4];
+  float c = viewMatrix[1];
+  float d = viewMatrix[5];
+  float tx = viewMatrix[12];
+  float ty = viewMatrix[13];
+
+  float determinant = a * d - b * c;
+
+  // can't invert a determinant of zero
+  if (determinant == 0.0f) return;
+
+  float inverse_determinant = 1.0f / determinant;
+
+  float px = *x - tx;
+  float py = *y - ty;
+
+  float ix = (d * px + -b * py) * inverse_determinant;
+  float iy = (-c * px + a * py) * inverse_determinant;
+
+  *x = ix;
+  *y = iy;
+}
+
+
+/*
  * Initialize OpenGL
  */
 int R2D_GL_Init(R2D_Window *window) {
@@ -246,6 +318,7 @@ int R2D_GL_Init(R2D_Window *window) {
     #if GLES
       R2D_GLES_Init();
       R2D_GL_SetViewport(window);
+      R2D_GLES_ApplyView(viewMatrix);
 
     // Initialize OpenGL 3.3+
     #else
@@ -256,6 +329,7 @@ int R2D_GL_Init(R2D_Window *window) {
       #endif
       R2D_GL3_Init();
       R2D_GL_SetViewport(window);
+      R2D_GL3_ApplyView(viewMatrix);
     #endif
 
   // Context could not be created
@@ -278,6 +352,7 @@ int R2D_GL_Init(R2D_Window *window) {
         R2D_GL2 = true;
         R2D_GL2_Init();
         R2D_GL_SetViewport(window);
+        R2D_GL2_ApplyView(viewMatrix);
 
       // Could not create any OpenGL contexts, hard failure
       } else {

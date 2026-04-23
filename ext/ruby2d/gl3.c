@@ -25,7 +25,7 @@ void R2D_GL3_ApplyProjection(GLfloat orthoMatrix[16]) {
 
   // Apply the projection matrix to the triangle shader
   glUniformMatrix4fv(
-    glGetUniformLocation(shaderProgram, "u_mvpMatrix"),
+    glGetUniformLocation(shaderProgram, "u_projMatrix"),
     1, GL_FALSE, orthoMatrix
   );
 
@@ -34,8 +34,32 @@ void R2D_GL3_ApplyProjection(GLfloat orthoMatrix[16]) {
 
   // Apply the projection matrix to the texture shader
   glUniformMatrix4fv(
-    glGetUniformLocation(texShaderProgram, "u_mvpMatrix"),
+    glGetUniformLocation(texShaderProgram, "u_projMatrix"),
     1, GL_FALSE, orthoMatrix
+  );
+}
+
+
+/*
+ * Applies the view matrix
+ */
+void R2D_GL3_ApplyView(GLfloat viewMatrix[16]) {
+
+  glUseProgram(shaderProgram);
+
+  // Apply the view matrix to the triangle shader
+  glUniformMatrix4fv(
+    glGetUniformLocation(shaderProgram, "u_viewMatrix"),
+    1, GL_FALSE, viewMatrix
+  );
+
+  // Use the texture program object
+  glUseProgram(texShaderProgram);
+
+  // Apply the view matrix to the texture shader
+  glUniformMatrix4fv(
+    glGetUniformLocation(texShaderProgram, "u_viewMatrix"),
+    1, GL_FALSE, viewMatrix
   );
 }
 
@@ -53,7 +77,8 @@ int R2D_GL3_Init() {
   GLchar vertexSource[] =
     "#version 150 core\n"  // shader version
 
-    "uniform mat4 u_mvpMatrix;"  // projection matrix
+    "uniform mat4 u_projMatrix;"  // projection matrix
+    "uniform mat4 u_viewMatrix;"  // view matrix
 
     // Input attributes to the vertex shader
     "in vec4 position;"  // position value
@@ -68,8 +93,8 @@ int R2D_GL3_Init() {
     // Send the color and texture coordinates right through to the fragment shader
     "  Color = color;"
     "  Texcoord = texcoord;"
-    // Transform the vertex position using the projection matrix
-    "  gl_Position = u_mvpMatrix * position;"
+    // Transform the vertex position using the projection and view matrices
+    "  gl_Position = u_projMatrix * u_viewMatrix * position;"
     "}";
 
   // Fragment shader source string

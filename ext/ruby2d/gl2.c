@@ -16,10 +16,15 @@ void R2D_GL2_ApplyProjection(int w, int h) {
 
   // Multiply the current matrix with the orthographic matrix
   glOrtho(0.f, w, h, 0.f, -1.f, 1.f);
+}
 
-  // Initialize the model-view matrix
+
+/*
+ * Applies the view matrix
+ */
+void R2D_GL2_ApplyView(GLfloat viewMatrix[16]) {
   glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
+  glLoadMatrixf(viewMatrix);
 }
 
 

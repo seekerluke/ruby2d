@@ -25,7 +25,7 @@ void R2D_GLES_ApplyProjection(GLfloat orthoMatrix[16]) {
 
   // Apply the projection matrix to the triangle shader
   glUniformMatrix4fv(
-    glGetUniformLocation(shaderProgram, "u_mvpMatrix"),
+    glGetUniformLocation(shaderProgram, "u_projMatrix"),
     1, GL_FALSE, orthoMatrix
   );
 
@@ -34,8 +34,32 @@ void R2D_GLES_ApplyProjection(GLfloat orthoMatrix[16]) {
 
   // Apply the projection matrix to the texture shader
   glUniformMatrix4fv(
-    glGetUniformLocation(texShaderProgram, "u_mvpMatrix"),
+    glGetUniformLocation(texShaderProgram, "u_projMatrix"),
     1, GL_FALSE, orthoMatrix
+  );
+}
+
+
+/*
+ * Applies the view matrix
+ */
+void R2D_GLES_ApplyView(GLfloat viewMatrix[16]) {
+
+  glUseProgram(shaderProgram);
+
+  // Apply the view matrix to the triangle shader
+  glUniformMatrix4fv(
+    glGetUniformLocation(shaderProgram, "u_viewMatrix"),
+    1, GL_FALSE, viewMatrix
+  );
+
+  // Use the texture program object
+  glUseProgram(texShaderProgram);
+
+  // Apply the view matrix to the texture shader
+  glUniformMatrix4fv(
+    glGetUniformLocation(texShaderProgram, "u_viewMatrix"),
+    1, GL_FALSE, viewMatrix
   );
 }
 
@@ -52,7 +76,8 @@ int R2D_GLES_Init() {
   // Vertex shader source string
   GLchar vertexSource[] =
     // uniforms used by the vertex shader
-    "uniform mat4 u_mvpMatrix;"   // projection matrix
+    "uniform mat4 u_projMatrix;"   // projection matrix
+    "uniform mat4 u_viewMatrix;"   // view matrix
 
     // attributes input to the vertex shader
     "attribute vec4 a_position;"  // position value
@@ -67,7 +92,8 @@ int R2D_GLES_Init() {
     "{"
     "  v_color = a_color;"
     "  v_texcoord = a_texcoord;"
-    "  gl_Position = u_mvpMatrix * a_position;"
+    // Transform the vertex position using the projection and view matrices
+    "  gl_Position = u_projMatrix * u_viewMatrix * a_position;"
     "}";
 
   // Fragment shader source string
